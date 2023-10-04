@@ -2,18 +2,25 @@ package com.iproovlibtest;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.bridge.*;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-@ReactModule(name = IproovLibTestModule.NAME)
+import android.content.Context;
+import android.os.Bundle;
+
+import com.caf.facelivenessiproov.input.CAFStage;
+import com.caf.facelivenessiproov.input.FaceLiveness;
+import com.caf.facelivenessiproov.input.VerifyLivenessListener;
+import com.caf.facelivenessiproov.input.iproov.Filter;
+import com.caf.facelivenessiproov.output.FaceLivenessResult;
+
 public class IproovLibTestModule extends ReactContextBaseJavaModule {
   public static final String NAME = "IproovLibTest";
+  private Context context;
 
   public IproovLibTestModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    this.context = reactContext;
   }
 
   @Override
@@ -22,11 +29,48 @@ public class IproovLibTestModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
-
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
   @ReactMethod
-  public void multiply(double a, double b, Promise promise) {
-    promise.resolve(a * b);
+  public void startFaceLiveness(String mobileToken, String personId) {
+    FaceLiveness faceLiveness = new FaceLiveness.Builder(mobileToken)
+      .setStage(CAFStage.BETA)
+      .setFilter(Filter.NATURAL)
+      .build();
+
+    faceLiveness.startSDK(this.context, personId, new VerifyLivenessListener() {
+      @Override
+      public void onSuccess(FaceLivenessResult faceLivenessResult) {
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onFaceLivenessSuccess", faceLivenessResult.getSignedResponse());
+      }
+
+      @Override
+      public void onError(FaceLivenessResult faceLivenessResult) {
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onFaceLivenessError", faceLivenessResult.getErrorMessage());
+      }
+
+      @Override
+      public void onCancel(FaceLivenessResult faceLivenessResult) {
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onFaceLivenessCancel", faceLivenessResult.getErrorMessage());
+      }
+
+      @Override
+      public void onLoading() {
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onFaceLivenessLoading", true);
+      }
+
+      @Override
+      public void onLoaded() {
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onFaceLivenessLoaded", true);
+      }
+    });
   }
 }

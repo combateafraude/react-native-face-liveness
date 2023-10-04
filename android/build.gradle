@@ -71,16 +71,36 @@ android {
     disable "GradleCompatible"
   }
 
+  buildFeatures {
+    dataBinding = true
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  aaptOptions {
+    noCompress "tflite"
+  }
+
+  dataBinding {
+    enabled = true
+  }
+
+  rootProject.allprojects {
+    repositories {
+      maven { url "https://repo.combateafraude.com/android/release" }
+      maven { url 'https://raw.githubusercontent.com/iProov/android/master/maven/' }
+    }
+  }
 }
 
 repositories {
   mavenCentral()
   google()
+
+  maven { url "https://repo.combateafraude.com/android/release" }
 }
 
 
@@ -89,6 +109,8 @@ dependencies {
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
+  implementation 'com.combateafraude.sdk:new-face-liveness:1.5.1'
+  implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }
 
 if (isNewArchitectureEnabled()) {
