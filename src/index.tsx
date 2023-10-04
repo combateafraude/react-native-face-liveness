@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+interface IproovLibTestType {
+  result: string | null;
+  error: string | null;
+  cancelled: string | null;
+  isLoading: boolean;
+}
+
 const LINKING_ERROR =
   `The package 'react-native-iproov-lib-test' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -25,7 +32,7 @@ export function startFaceLiveness(mobileToken: string, peopleId: string) {
   return module.startFaceLiveness(mobileToken, peopleId);
 }
 
-export function useFaceLiveness() {
+export function useFaceLiveness(): IproovLibTestType {
   const [result, setResult] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
