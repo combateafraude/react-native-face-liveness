@@ -38,21 +38,8 @@ const moduleEventEmitter = new NativeEventEmitter(module);
 let staged: StageType = 'PROD';
 let filtered: FilterType = 'LINE_DRAWING';
 
-function getStage(stage: StageType) {
-  return stage;
-}
-
-function getFilter(filter: FilterType) {
-  return filter;
-}
-
 export function startFaceLiveness(mobileToken: string, peopleId: string) {
-  return module.startFaceLiveness(
-    mobileToken,
-    peopleId,
-    getStage(staged),
-    getFilter(filtered)
-  );
+  return module.startFaceLiveness(mobileToken, peopleId, staged, filtered);
 }
 
 export function useFaceLiveness(
@@ -66,11 +53,18 @@ export function useFaceLiveness(
   if (options) {
     if (options.stage) {
       staged = options.stage;
+    } else {
+      staged = 'PROD';
     }
 
     if (options.filter) {
       filtered = options.filter;
+    } else {
+      filtered = 'LINE_DRAWING';
     }
+  } else {
+    staged = 'PROD';
+    filtered = 'LINE_DRAWING';
   }
 
   useEffect(() => {

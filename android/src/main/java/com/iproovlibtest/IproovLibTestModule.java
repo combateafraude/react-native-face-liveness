@@ -17,7 +17,6 @@ import com.caf.facelivenessiproov.output.FaceLivenessResult;
 public class IproovLibTestModule extends ReactContextBaseJavaModule {
   public static final String NAME = "IproovLibTest";
   private Context context;
-  private String stage;
 
   public IproovLibTestModule(ReactApplicationContext reactContext) {
     super(reactContext);
