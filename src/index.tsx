@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
-
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
-interface IproovLibTestType {
+export interface FaceLivenessResponse {
   result: string | null;
   error: string | null;
   cancelled: string | null;
   isLoading: boolean;
+}
+
+export type StageType = 'PROD' | 'BETA' | 'DEV';
+export type FilterType = 'NATURAL' | 'LINE_DRAWING';
+
+export interface FaceLivenessProps {
+  stage?: StageType;
+  filter?: FilterType;
 }
 
 const LINKING_ERROR =
@@ -28,15 +35,43 @@ const module = NativeModules.IproovLibTest
 
 const moduleEventEmitter = new NativeEventEmitter(module);
 
-export function startFaceLiveness(mobileToken: string, peopleId: string) {
-  return module.startFaceLiveness(mobileToken, peopleId);
+let staged: StageType = 'PROD';
+let filtered: FilterType = 'LINE_DRAWING';
+
+function getStage(stage: StageType) {
+  return stage;
 }
 
-export function useFaceLiveness(): IproovLibTestType {
+function getFilter(filter: FilterType) {
+  return filter;
+}
+
+export function startFaceLiveness(mobileToken: string, peopleId: string) {
+  return module.startFaceLiveness(
+    mobileToken,
+    peopleId,
+    getStage(staged),
+    getFilter(filtered)
+  );
+}
+
+export function useFaceLiveness(
+  options?: FaceLivenessProps
+): FaceLivenessResponse {
   const [result, setResult] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  if (options) {
+    if (options.stage) {
+      staged = options.stage;
+    }
+
+    if (options.filter) {
+      filtered = options.filter;
+    }
+  }
 
   useEffect(() => {
     moduleEventEmitter.addListener('onFaceLivenessSuccess', (event) => {

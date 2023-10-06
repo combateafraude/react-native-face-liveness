@@ -17,6 +17,7 @@ import com.caf.facelivenessiproov.output.FaceLivenessResult;
 public class IproovLibTestModule extends ReactContextBaseJavaModule {
   public static final String NAME = "IproovLibTest";
   private Context context;
+  private String stage;
 
   public IproovLibTestModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -29,11 +30,35 @@ public class IproovLibTestModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
+  public CAFStage getStage(String stage) {
+    switch(stage) {
+      case "PROD":
+        return CAFStage.PROD;
+      case "BETA":
+        return CAFStage.BETA;
+      case "DEV":
+        return CAFStage.DEV;
+      default:
+        return CAFStage.PROD;
+    }
+  }
+
+  public Filter getFilter(String filter) {
+    switch(filter) {
+      case "LINE_DRAWING":
+        return Filter.LINE_DRAWING;
+      case "NATURAL":
+        return Filter.NATURAL;
+      default:
+        return Filter.LINE_DRAWING;
+    }
+  }
+
   @ReactMethod
-  public void startFaceLiveness(String mobileToken, String personId) {
+  public void startFaceLiveness(String mobileToken, String personId, String stage, String filter) {
     FaceLiveness faceLiveness = new FaceLiveness.Builder(mobileToken)
-      .setStage(CAFStage.BETA)
-      .setFilter(Filter.NATURAL)
+      .setStage(getStage(stage))
+      .setFilter(getFilter(filter))
       .build();
 
     faceLiveness.startSDK(this.context, personId, new VerifyLivenessListener() {

@@ -11,7 +11,10 @@ export default function App() {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2NTFiMWNhNTFhNGQwMzAwMDgyNGFhM2MifQ.ih_vkRDcFuZaEDNZot8ermoBf9oRlIaubLon44hiTIk';
   const PERSON_ID = '43485449806';
 
-  const { result, error, cancelled, isLoading } = useFaceLiveness();
+  const { result, error, cancelled, isLoading } = useFaceLiveness({
+    stage: 'BETA',
+    filter: 'NATURAL',
+  });
 
   console.log(result, error, cancelled, isLoading);
 
